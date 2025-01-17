@@ -15,13 +15,17 @@ namespace Fraction
         public int Numerator => _numerator;
         public int Denominator => _denominator;
 
-        public FractionClass(int a, int b) 
+        public FractionClass(int numerator, int denominator) 
         {
-            _numerator = a;
-            _denominator = b;
+            if (denominator == 0) 
+                throw new ArgumentException($"{nameof(denominator)} cannot be zero.");
+            _numerator = numerator;
+            _denominator = denominator;
         }
         public FractionClass(int numerator, int denominator, int wholeNum)
         {
+            if (denominator == 0)
+                throw new ArgumentException($"{nameof(denominator)} cannot be zero.");
             _numerator = numerator;
             _denominator = denominator;
             _wholeNum = wholeNum;
@@ -71,5 +75,8 @@ namespace Fraction
                 return true;
             return false;
         }
+
+        // operators
+        
     }
 }

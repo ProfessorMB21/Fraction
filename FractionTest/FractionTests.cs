@@ -46,23 +46,28 @@ namespace FractionTest
         {
             get
             {
-                using (var sr = new StreamReader("fraction_test.txt", System.Text.Encoding.UTF8))
+                string tests_filePath = "C:\\Users\\Lenovo\\source\\repos\\Fraction\\FractionTest\\fraction_test.txt";
+                using (var sr = new StreamReader(tests_filePath, System.Text.Encoding.UTF8))
                 {
                     while (true)
                     {
-                        var data = sr.ReadLine()?.Split(',', ' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        var data = sr.ReadLine()?.Split(',', ' ', 
+                            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+                            );
+
                         if (data is not null)
                         {
                             FractionClass f;
+                            var values = data[0].Split('/');
                             try
                             {
-                                f = new FractionClass(int.Parse(data[0]), int.Parse(data[1]));
+                                f = new FractionClass(int.Parse(values[0]), int.Parse(values[1]));
                             }
                             catch
                             {
                                 f = new FractionClass();
                             }
-                            yield return new object[] { f, data[2] };
+                            yield return new object[] { f, data[1].Trim() };
                         }
                         else yield break;
                     };
