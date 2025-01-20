@@ -60,7 +60,7 @@ namespace Fraction
         }
         private FractionClass Subtract(FractionClass other)
         {
-            int lcd = lcm(this.Denominator, other.Denominator);
+            int lcd = LCM(this.Denominator, other.Denominator);
 
             _numerator *= (lcd / this.Denominator);
             other._numerator *= (lcd / other.Denominator);
@@ -92,12 +92,18 @@ namespace Fraction
 
         public int CompareTo(FractionClass? other)
         {
-            if (other == null) return -1;
-            return Numerator.CompareTo(other.Numerator) & Denominator.CompareTo(other.Denominator);
-            //return Value.CompareTo(other.Value);
+            if (other is null) return 1;
+            return Value.CompareTo(other.Value);
         }
 
         // operators
+        public static bool operator ==(FractionClass _this, FractionClass other) => _this.Equals(other);
+        public static bool operator !=(FractionClass _this, FractionClass other) => !_this.Equals(other);
+        public static bool operator >(FractionClass _this, FractionClass other) => _this.CompareTo(other) > 0;
+        public static bool operator <(FractionClass _this, FractionClass other) => _this.CompareTo(other) < 0;
+        public static bool operator >=(FractionClass _this, FractionClass other) => _this.CompareTo(other) >= 0;
+        public static bool operator <=(FractionClass _this, FractionClass other) => _this.CompareTo(other) <= 0;
+
         public static FractionClass operator+(FractionClass _this, FractionClass other)
         {
             if (_this is null || other is null)
