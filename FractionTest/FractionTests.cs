@@ -8,7 +8,7 @@ namespace FractionTest
         [Theory(DisplayName = "ToString method unit tests.")]
         [InlineData(1, 2, "1/2")]
         [InlineData(3, 5, "3/5")]
-        [InlineData(0, 1, "0/1")]
+        [InlineData(0, 1, "0")]
         [InlineData(6, 7, "6/7")]
         [InlineData(-1, 9, "-1/9")]
         [InlineData(2, -11, "-2/11")]
@@ -44,7 +44,7 @@ namespace FractionTest
                             {
                                 f = new FractionClass();
                             }
-                            yield return new object[] { f, data[1].Trim() };
+                            yield return new object[] { f, data[1] };
                         }
                         else yield break;
                     };
@@ -202,14 +202,13 @@ namespace FractionTest
         [Theory(DisplayName ="Multiplication operator on fractions unit tests.")]
         [InlineData(1, 5, 3, 7, "3/35")]
         [InlineData(4, 3, 2, 9, "8/27")]
-        [InlineData(0, 2, -4, 9, "0/18")]
+        [InlineData(0, 2, -4, 9, "0")]
         [InlineData(-2, 5, 3, 7, "-6/35")]
         [InlineData(2, -5, 3, 7, "-6/35")]
         [InlineData(2, 5, -3, 7, "-6/35")]
         [InlineData(2, 5, 3, -7, "-6/35")]
         [InlineData(3, 4, 1, 2, "3/8")]
-        [InlineData(3, 0, -5, 8, "-15/0", Skip ="Division by zero.")]
-        [InlineData(-1, -2, -2, -3, "2/6")]
+        [InlineData(-1, -2, -2, -3, "1/3")]
         public void MultiplyOperator_Fraction_ReturnsExpected(int n1, int d1, int n2, int d2, string expected)
         {
             var f1 = new FractionClass(n1, d1);
@@ -225,7 +224,7 @@ namespace FractionTest
         [InlineData(1, 5, -4, 9, "-9/20")]
         [InlineData(1, -5, 4, 9, "-9/20")]
         [InlineData(1, 5, 4, -9, "-9/20")]
-        [InlineData(0, 5, 4, 9, "0/20")]
+        [InlineData(0, 5, 4, 9, "0")]
         [InlineData(-1, -5, -4, -9, "9/20")]
         [InlineData(1, 5, -4, -9, "9/20")]
         public void DivisionOperator_Fraction_ReturnsExpected(int n1, int d1, int n2, int d2, string expected)
@@ -237,6 +236,154 @@ namespace FractionTest
             Assert.Equal(expected, actual.ToString());
         }
 
+        [Theory(DisplayName ="Constructor with whole number unit tests.")]
+        [InlineData(1, 1, 3, "4/3")]
+        [InlineData(2, 3, 5, "13/5")]
+        [InlineData(-1, -1, 3, "-4/3")]
+        [InlineData(3, 3, 4, "15/4")]
+        public void FractionClass_Constructor_WithWholeNumber_ReturnsExpected(int wholeNum, int numerator, int denominator, string expected)
+        {
+            var f1 = new FractionClass(numerator, denominator, wholeNum);
+            Assert.Equal(expected, f1.ToString());
+        }
 
+        [Fact(DisplayName ="FractionClass constructor with whole number throw exception unit tests.")]
+        public void FractionClass_Constructor_WithWholeNumber_Throws()
+        {
+            Assert.Throws<ArgumentException>(() => new FractionClass(1, 3, -1));
+            Assert.Throws<ArgumentException>(() => new FractionClass(3, 5, -5));
+            Assert.Throws<ArgumentException>(() => new FractionClass(5, 3, -2));
+            Assert.Throws<ArgumentException>(() => new FractionClass(-1, 3, 5));
+            Assert.Throws<ArgumentException>(() => new FractionClass(-3, 5, 1));
+        }
+
+        [Fact(DisplayName ="FractionClass constructor with no parameters unit tests.")]
+        public void FractionClass_Constructor_WithNoParams_ReturnsExpected()
+        {
+            var f1 = new FractionClass();
+            var expected = "0";
+            Assert.Equal(expected, f1.ToString());
+
+            var f2 = new FractionClass();
+            Assert.Equal(expected, f2.ToString());
+        }
+
+        [Fact(DisplayName ="GetHashCode method on fractions with same values unit tests.")]
+        public void GetHashCode_FractionClass_SameValues_ReturnsExpected()
+        {
+            var f1 = new FractionClass(1, 2);
+            var f2 = new FractionClass(2, 4);
+            var f3 = new FractionClass(1, 2);
+
+            var f1_HashCode = f1.GetHashCode();
+            var f2_HashCode = f2.GetHashCode();
+            var f3_HashCode = f3.GetHashCode();
+            
+            Assert.True(f1_HashCode == f2_HashCode);
+            Assert.True(f1_HashCode == f3_HashCode);
+            Assert.True(f2_HashCode == f3_HashCode);
+        }   
+        
+        [Fact(DisplayName ="GetHashCode method on fractions with different values unit tests.")]
+        public void GetHashCode_FractionClass_DiffValues_ReturnsExpected()
+        {
+            var f1 = new FractionClass(1, 3);
+            var f2 = new FractionClass(2, 4);
+            var f3 = new FractionClass(-1, 2);
+
+            var f1_HashCode = f1.GetHashCode();
+            var f2_HashCode = f2.GetHashCode();
+            var f3_HashCode = f3.GetHashCode();
+            
+            Assert.False(f1_HashCode == f2_HashCode);
+            Assert.False(f1_HashCode == f3_HashCode);
+            Assert.False(f2_HashCode == f3_HashCode);
+        }
+
+        public static IEnumerable<object[]> EqualComparisonMethodTests
+        {
+            get
+            {
+                string tests_filename = "comparison_methods_tests.txt";
+                using (var sr = new StreamReader(tests_filename, System.Text.Encoding.UTF8))
+                {
+                    while (true)
+                    {
+                        var data = sr.ReadLine()?.Split(',', ' ',
+                            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+                            );
+
+                        if (data is not null)
+                        {
+                            FractionClass f1, f2;
+                            var val1 = data[0].Split('/');
+                            var val2 = data[1].Split('/');
+                            try
+                            {
+                                f1 = new FractionClass(int.Parse(val1[0]), int.Parse(val1[1]));
+                                f2 = new FractionClass(int.Parse(val2[0]), int.Parse(val2[1]));
+                            }
+                            catch
+                            {
+                                f1 = new FractionClass();
+                                f2 = new FractionClass();
+                            }
+                            yield return new object[] { f1, f2 };
+                        }
+                        else yield break;
+
+                    }
+                }
+            }
+        }
+        [Theory(DisplayName ="Equal method on fractions with same values unit tests.")]
+        [MemberData(nameof(EqualComparisonMethodTests))]
+        public void Equal_FractionClass_WithSameValues_ReturnsExpected(FractionClass f1, FractionClass f2)
+        {
+            Assert.True(f1.Equals(f2));
+        }
+
+        public static IEnumerable<object[]> CompareToComparisonMethodTests
+        {
+            get
+            {
+                string tests_filename = "comparison_methods_tests.txt";
+                using (var sr = new StreamReader(tests_filename, System.Text.Encoding.UTF8))
+                {
+                    while (true)
+                    {
+                        var data = sr.ReadLine()?.Split(',', ' ',
+                            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+                            );
+
+                        if (data is not null)
+                        {
+                            FractionClass f1, f2;
+                            var val1 = data[0].Split('/');
+                            var val2 = data[1].Split('/');
+                            try
+                            {
+                                f1 = new FractionClass(int.Parse(val1[0]), int.Parse(val1[1]));
+                                f2 = new FractionClass(int.Parse(val2[0]), int.Parse(val2[1]));
+                            }
+                            catch
+                            {
+                                f1 = new FractionClass();
+                                f2 = new FractionClass();
+                            }
+                            yield return new object[] { f1, f2, data[2] };
+                        }
+                        else yield break;
+
+                    }
+                }
+            }
+        }
+        [Theory(DisplayName ="CompareTo method on fractions with same values unit tests.")]
+        [MemberData(nameof(CompareToComparisonMethodTests))]
+        public void CompareTo_FractionClass_WithSameValues_ReturnsExpected(FractionClass f1, FractionClass f2, int expected)
+        {
+            Assert.Equal(expected, f1.CompareTo(f2));
+        }
     }
 }

@@ -32,25 +32,37 @@ namespace Fraction
         {
             Denominator = denominator;
             Numerator = numerator;
+            Simplify();
         }
         public FractionClass(int numerator, int denominator, int wholeNumber)
             : this(wholeNumber * denominator + numerator, denominator)
         {
-            if (wholeNumber < 0 && numerator > 0)
+            if ((wholeNumber < 0 && numerator > 0) ||( wholeNumber > 0 && numerator < 0))
                 throw new ArgumentException($"In a mixed fraction, the {nameof(numerator)} must have the same sign as the whole number.");
         }
         public FractionClass() : this(0, 1) { }
-        
-        private int gcd(int a, int b)
+
+        private void Simplify()
+        {
+            int lcd = GCD(Math.Abs(Numerator), Math.Abs(Denominator));
+            Denominator /= lcd;
+            Numerator /= lcd;
+
+            if (Denominator < 0)
+            {
+                Denominator = -Denominator;
+                Numerator = -Numerator;
+            }
+        }
+        private int GCD(int a, int b)
         {
             if (a == 0) return b;
-            return gcd(b % a, a);
+            return GCD(b % a, a);
         }
-        private int lcm(int a, int b) => (a * b) / gcd(a, b);
-       
+        private int LCM(int a, int b) => (a * b) / GCD(a, b);
         private FractionClass Add(FractionClass other)
         {
-            int lcd = lcm(this.Denominator, other.Denominator);
+            int lcd = LCM(this.Denominator, other.Denominator);
 
             _numerator *= (lcd / this.Denominator);
             other._numerator *= (lcd / other.Denominator);
@@ -71,7 +83,8 @@ namespace Fraction
         
         public override string ToString()
         {
-            if (Numerator < 0 && Denominator < 0)
+            if (Numerator == 0) return "0";
+            else if (Numerator < 0 && Denominator < 0)
                 return $"{Math.Abs(_numerator)}/{Math.Abs(_denominator)}";
             else if (Numerator > 0 && Denominator < 0 || Numerator < 0 && Denominator > 0)
                 return $"-{Math.Abs(_numerator)}/{Math.Abs(_denominator)}";
