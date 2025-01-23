@@ -21,8 +21,8 @@ namespace Fraction
             get => _denominator;
             private set
             {
-                if (value == 0)
-                    throw new ArgumentException("Denominator cannot be zero.");
+                //if (value == 0)
+                  //  throw new ArgumentException("Denominator cannot be zero.");
                 _denominator = value;
             }
         }
@@ -84,9 +84,19 @@ namespace Fraction
         public override string ToString()
         {
             if (Numerator == 0) return "0";
-            else if (Numerator < 0 && Denominator < 0)
-                return $"{Math.Abs(_numerator)}/{Math.Abs(_denominator)}";
-            else if (Numerator > 0 && Denominator < 0 || Numerator < 0 && Denominator > 0)
+            else if (Math.Abs(Numerator) > Math.Abs(Denominator))
+            {
+                var quotient = Numerator / Denominator;
+                var remainder = Numerator % Denominator;
+                return $"{quotient} {remainder}/{Denominator}";
+            }
+            //else if (Numerator < 0 && Denominator < 0)
+            //    return $"{Math.Abs(_numerator)}/{Math.Abs(_denominator)}";
+            else 
+            if (
+                (Numerator > 0 && Denominator < 0) 
+                || (Numerator < 0 && Denominator > 0)
+                )
                 return $"-{Math.Abs(_numerator)}/{Math.Abs(_denominator)}";
             return $"{_numerator}/{_denominator}";
         }
@@ -121,12 +131,16 @@ namespace Fraction
         {
             if (_this is null || other is null)
                 throw new ArgumentNullException($"{(_this is null ? nameof(_this) : nameof(other))} is null.");
+            else if (other.Denominator == 0 || _this.Denominator == 0)
+                throw new DivideByZeroException("Division by zero not allowed.");
             return _this.Add(other);
         }
         public static FractionClass operator-(FractionClass _this, FractionClass other)
         {
             if (_this is null || other is null)
                 throw new ArgumentNullException($"{(_this is null ? nameof(_this) : nameof(other))} is null.");
+            else if (other.Denominator == 0 || _this.Denominator == 0)
+                throw new DivideByZeroException("Division by zero not allowed.");
             return _this.Subtract(other);
         }
         public static FractionClass operator*(FractionClass _this, FractionClass other)
